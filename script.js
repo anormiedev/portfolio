@@ -125,14 +125,14 @@ class TerminalAnimation {
             const command = this.commands[this.commandIndex];
 
             this.typeCommand(command, () => {
+                const currentLine = this.terminalContent.lastElementChild;
+                const gitPart = this.inGitRepo ? ' <span class="prompt-git">(main)</span>' : '';
+                currentLine.innerHTML = `<span class="prompt-user">cloud@machine</span> <span class="prompt-dir">${this.currentDir}</span>${gitPart} $ ${command}`;
+
                 if (command === 'cd portfolio') {
                     this.inGitRepo = true;
                     this.currentDir = '~/portfolio';
                 }
-
-                const currentLine = this.terminalContent.lastElementChild;
-                const gitPart = this.inGitRepo ? ' <span class="prompt-git">(main)</span>' : '';
-                currentLine.innerHTML = `<span class="prompt-user">cloud@machine</span> <span class="prompt-dir">${this.currentDir}</span>${gitPart} $ ${command}`;
 
                 this.commandIndex++;
 
