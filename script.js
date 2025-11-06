@@ -205,6 +205,15 @@ class ScrollIndicator {
         this.timeout = null;
         window.addEventListener('scroll', () => this.updateIndicator());
         this.updateIndicator();
+
+        // Update position on resize to handle mobile viewport changes
+        this.updatePosition = () => {
+            const centerY = window.innerHeight / 2;
+            this.indicator.style.top = centerY + 'px';
+            this.indicator.style.transform = 'translateY(-50%)';
+        };
+        this.updatePosition();
+        window.addEventListener('resize', this.updatePosition);
     }
 
     updateIndicator() {
