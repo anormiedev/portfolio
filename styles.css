@@ -1284,4 +1284,9 @@ footer {
         width: 9px;
         height: 9px;
     }
+
+    .scroll-indicator {
+        position: fixed !important;
+        right: 15px;
+    }
 }
