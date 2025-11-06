@@ -1,66 +1,66 @@
-// Dark mode toggle
+// Theme Management
 const themeToggle = document.getElementById('theme-toggle');
-const htmlElement = document.documentElement;
-const darkModeKey = 'portfolio-dark-mode';
+const html = document.documentElement;
+const THEME_KEY = 'portfolio-dark-mode';
 
-// Initialize theme on page load
-function initializeTheme() {
-    // Check if user has a saved preference
-    const savedTheme = localStorage.getItem(darkModeKey);
+const setTheme = (isDark) => {
+    html.classList.toggle('dark-mode', isDark);
+    localStorage.setItem(THEME_KEY, isDark);
+};
 
-    if (savedTheme !== null) {
-        // Use saved preference
-        if (savedTheme === 'true') {
-            enableDarkMode();
-        } else {
-            disableDarkMode();
-        }
-    } else {
-        // Check system preference
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            enableDarkMode();
-        }
-    }
-}
+const initTheme = () => {
+    const saved = localStorage.getItem(THEME_KEY);
+    const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+    setTheme(saved !== null ? saved === 'true' : prefersDark);
+};
 
-function enableDarkMode() {
-    htmlElement.classList.add('dark-mode');
-    localStorage.setItem(darkModeKey, 'true');
-}
+themeToggle?.addEventListener('click', () => setTheme(!html.classList.contains('dark-mode')));
+window.matchMedia?.('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (localStorage.getItem(THEME_KEY) === null) setTheme(e.matches);
+});
 
-function disableDarkMode() {
-    htmlElement.classList.remove('dark-mode');
-    localStorage.setItem(darkModeKey, 'false');
-}
+initTheme();
 
-function toggleDarkMode() {
-    if (htmlElement.classList.contains('dark-mode')) {
-        disableDarkMode();
-    } else {
-        enableDarkMode();
-    }
-}
+// Custom Scroll Indicator
+document.addEventListener('DOMContentLoaded', () => {
+    const sections = document.querySelectorAll('.section');
+    if (!sections.length) return;
 
-// Event listener for toggle button
-themeToggle.addEventListener('click', toggleDarkMode);
+    const indicator = document.createElement('div');
+    indicator.className = 'scroll-indicator';
+    document.body.appendChild(indicator);
 
-// Listen for system theme changes
-if (window.matchMedia) {
-    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    darkModeQuery.addEventListener('change', (e) => {
-        if (!localStorage.getItem(darkModeKey)) {
-            if (e.matches) {
-                enableDarkMode();
-            } else {
-                disableDarkMode();
-            }
-        }
+    const dots = Array.from(sections).map((section, index) => {
+        const dot = document.createElement('div');
+        dot.className = 'scroll-dot';
+        dot.onclick = () => section.scrollIntoView({ behavior: 'smooth' });
+        indicator.appendChild(dot);
+        return dot;
     });
-}
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', initializeTheme);
-initializeTheme();
+    let timeout;
+    const updateIndicator = () => {
+        indicator.classList.add('visible');
+        clearTimeout(timeout);
+        timeout = setTimeout(() => indicator.classList.remove('visible'), 1500);
 
+        const isBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 10;
+        let current = isBottom ? sections.length - 1 : 0;
 
-//hellog
+        if (!isBottom) {
+            let minDist = Infinity;
+            sections.forEach((section, i) => {
+                const dist = Math.abs(section.getBoundingClientRect().top);
+                if (dist < minDist) {
+                    minDist = dist;
+                    current = i;
+                }
+            });
+        }
+
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === current));
+    };
+
+    window.addEventListener('scroll', updateIndicator);
+    updateIndicator();
+});
